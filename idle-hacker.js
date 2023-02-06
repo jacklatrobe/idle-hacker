@@ -1,6 +1,63 @@
 // IDLE HACKER - jack@latrobe.group
 // https://github.com/jacklatrobe/idle-hacker
 
+/* define the logging framework */
+class LoggingLevel {
+    static INFO = new LoggingLevel("INFO");
+    static WARN = new LoggingLevel("WARN");
+    static ERROR = new LoggingLevel("ERROR");
+
+    static levelmap = {
+        "INFO" : {
+            "obj" : this.INFO,
+            "name" : "INFO",
+            "value" : 0
+        },
+        "WARN" : {
+            "obj" : this.WARN,
+            "name" : "WARN",
+            "value" : 1
+        },
+        "ERROR" : {
+            "obj" : this.ERROR,
+            "name" : "ERROR",
+            "value" : 3
+        }
+    };
+
+    constructor(level) {
+        if (level in levelmap) {
+            this.name = levelmap[level].name
+            this.value = levelmap[level].value
+            this.obj = levelmap[level].obj
+        }
+        else
+        {
+            throw new Error(level + ' is not a valid logging level');
+        }
+    }
+
+    toString() {
+        return this.name;
+    }
+
+    toInt() {
+        return this.value;
+    }
+
+    get obj() {
+        return this.obj;
+    }
+
+    get name() {
+        return this.name;
+    }
+
+    get value() {
+        return this.value;
+    }
+};
+
 /* define the jobs */
 const jobs = {
     "line_cook": {
@@ -8,7 +65,7 @@ const jobs = {
         "company": "McDonalds",
         "salary": 15
     }
-}
+};
 
 /* define the education */
 const education = {
@@ -30,7 +87,7 @@ const education = {
         "date": "2005 - ???",
         "skills" : ["computer_hardware","server_hardware", "office_software", "known_vulnerabilities"]
     }
-}
+};
 
 /* define the skills */
 var skills = {
@@ -64,7 +121,7 @@ var skills = {
         "desc": "A basic knowledge of some published CVEs and how to exploit them",
         "progress": 0
     }
-}
+};
 
 /* define the languages */
 var languages = {
@@ -88,52 +145,85 @@ var languages = {
         "desc": "A powerful low-level language for high performance applications.",
         "progress": 0
     }
-}
+};
 
 /* main game loop */
-var game_date = new Date(2010, 0, 1);
-var cash = 0;
-var current_job = jobs.line_cook;
-
-console.log("Welcome to IDLE HACKER V0.1 - jack@latrobe.group");
 var gameLoop = function () {
     /* handle date change */
     game_date.setDate(game_date.getDate() + 1);
-    console.log("Incrementing date to " + (game_date.getDate() + '/' + game_date.getMonth() + '/' + game_date.getFullYear()));
+    pretty_game_date = (game_date.getDate() + '/' + game_date.getMonth() + '/' + game_date.getFullYear());
+    gameLog("Incrementing date to " + pretty_game_date, loggingLevel.INFO);
     document.getElementById('date_line').innerHTML = (
         '<i class="fa fa-calendar fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
-        game_date.getDate() + '/' + game_date.getMonth() + '/' + game_date.getFullYear());
+        pretty_game_date);
 
 
     /* handle cash change */
     cash = cash + (current_job.salary * 8);
-    console.log("Incrementing cash to $" + cash);
+    gameLog("Incrementing cash to $" + cash, loggingLevel.INFO);
     document.getElementById('cash_line').innerHTML = (
         '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' + 
         cash);
 
 
     /* handle education change */
-    console.log("Doing education change");
+    gameLog("Doing education change", loggingLevel.INFO);
     for (var course in education) {
         course_details = education[course];
-        console.log(course_details.title + " increases " + course_details.skills);
+        gameLog(course_details.title + " increases " + course_details.skills, loggingLevel.INFO);
         for (var i = 0; i < course_details.skills.length; i++) {
             course_skill = course_details.skills[i];
-            console.log("Checking " + course_skill);
+            gameLog("Checking " + course_skill, loggingLevel.INFO);
             if (skills[course_skill].progress < 100) {
-                console.log(course_skill + " is less than 100, increasing");
+                gameLog(course_skill + " is less than 100, increasing", loggingLevel.INFO);
                 skills[course_skill].progress = skills[course_skill].progress + 1
                 document.getElementById('skill-bar-' + course_skill).style = "width:" + skills[course_skill].progress + "%";
                 document.getElementById('skill-number-' + course_skill).innerHTML = skills[course_skill].progress + "%";
             }
             else {
-                console.log(course_skill + " is 100, not increasing");
+                gameLog(course_skill + " is 100, not increasing", loggingLevel.INFO);
+            }
+        }
+      }
+
+    /* handle education change */
+    gameLog("Doing education change", loggingLevel.INFO);
+    for (var course in education) {
+        course_details = education[course];
+        gameLog(course_details.title + " increases " + course_details.skills, loggingLevel.INFO);
+        for (var i = 0; i < course_details.skills.length; i++) {
+            course_skill = course_details.skills[i];
+            gameLog("Checking " + course_skill, loggingLevel.INFO);
+            if (skills[course_skill].progress < 100) {
+                gameLog(course_skill + " is less than 100, increasing", loggingLevel.INFO);
+                skills[course_skill].progress = skills[course_skill].progress + 1
+                document.getElementById('skill-bar-' + course_skill).style = "width:" + skills[course_skill].progress + "%";
+                document.getElementById('skill-number-' + course_skill).innerHTML = skills[course_skill].progress + "%";
+            }
+            else {
+                gameLog(course_skill + " is 100, not increasing", loggingLevel.INFO);
             }
         }
       }
 
     setTimeout(gameLoop, 1000);
 };
+
+var gameLog = function (text, severity = loggingLevel.WARN) {
+    if (severity >= logLevel) {
+        let currDate = Date.now();
+        let logline = (severity.toString + " - " + currDate + " - " + text);
+        console.log(logline);
+    }
+};
+
+
+/* main game flow */
+var game_date = new Date(2010, 0, 1);
+var cash = 0;
+var current_job = jobs.line_cook;
+var logLevel = loggingLevel.INFO;
+
+gameLog("Welcome to IDLE HACKER V0.1 - jack@latrobe.group");
 
 gameLoop();
