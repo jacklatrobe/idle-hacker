@@ -117,13 +117,17 @@ var gameLoop = function () {
     for (var course in education) {
         course_details = education[course];
         console.log(course_details.title + " increases " + course_details.skills);
-        for (var course_skill in course_details.skills) {
+        for (var i = 0; i < course_details.skills.length; i++) {
+            course_skill = course_details.skills[i];
             console.log("Checking " + course_skill);
             if (skills[course_skill].progress < 100) {
                 console.log(course_skill + " is less than 100, increasing");
                 skills[course_skill].progress = skills[course_skill].progress + 1
                 document.getElementById('skill-bar-' + course_skill).style = "width:" + skills[course_skill].progress + "%";
                 document.getElementById('skill-number-' + course_skill).innerHTML = skills[course_skill].progress + "%";
+            }
+            else {
+                console.log(course_skill + " is 100, not increasing");
             }
         }
       }
