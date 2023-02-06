@@ -1,4 +1,5 @@
 // IDLE HACKER - jack@latrobe.group
+// https://github.com/jacklatrobe/idle-hacker
 
 /* define the jobs */
 const jobs = {
