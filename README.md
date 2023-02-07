@@ -1,5 +1,6 @@
 # IDLE-HACKER V0.1
-https://github.com/jacklatrobe/idle-hacker
+SRC: https://github.com/jacklatrobe/idle-hacker
+GAME: https://jacklatrobe.github.io/idle-hacker/
 
 ## Introduction
 A simple javascript incremental game that focusses on your building your resume up for your budding hacking career
