@@ -3,8 +3,8 @@
 
 /* define the logging framework */
 const LoggingLevel = {
-    INFO : 0,
-    WARN : 1,
+    INFO: 0,
+    WARN: 1,
     ERROR: 2,
     get INFO() {
         return {
@@ -41,19 +41,19 @@ const education = {
         "title": "Wikipedia.org",
         "desc": "Learn basic knowledge about how the world around you fits together.",
         "date": "Forever",
-        "skills" : ["electronics","computer_hardware", "office_software"]
+        "skills": ["electronics", "computer_hardware", "office_software"]
     },
     "codeacademy": {
         "title": "CodeAcademy.com",
         "desc": "Slowly develop basic program skills in your spare time",
         "date": "Forever",
-        "skills" : ["computer_hardware", "developer_environments", "server_hardware"]
+        "skills": ["computer_hardware", "developer_environments", "server_hardware"]
     },
     "high_school": {
         "title": "High School",
         "desc": "It ain't nothin fancy, but they taught you to read reeeeeel gud.",
         "date": "2005 - ???",
-        "skills" : ["computer_hardware","server_hardware", "office_software", "known_vulnerabilities"]
+        "skills": ["computer_hardware", "server_hardware", "office_software", "known_vulnerabilities"]
     }
 };
 
@@ -130,7 +130,7 @@ var gameLoop = function () {
     cash = cash + (current_job.salary * 8);
     gameLog("Incrementing cash to $" + cash, LoggingLevel.INFO);
     document.getElementById('cash_line').innerHTML = (
-        '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' + 
+        '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
         cash);
 
 
@@ -152,27 +152,21 @@ var gameLoop = function () {
                 gameLog(course_skill + " is 100, not increasing", LoggingLevel.INFO);
             }
         }
-      }
+    }
 
-    /* handle education change */
-    gameLog("Doing education change", LoggingLevel.INFO);
-    for (var course in education) {
-        course_details = education[course];
-        gameLog(course_details.title + " increases " + course_details.skills, LoggingLevel.INFO);
-        for (var i = 0; i < course_details.skills.length; i++) {
-            course_skill = course_details.skills[i];
-            gameLog("Checking " + course_skill, LoggingLevel.INFO);
-            if (skills[course_skill].progress < 100) {
-                gameLog(course_skill + " is less than 100, increasing", LoggingLevel.INFO);
-                skills[course_skill].progress = skills[course_skill].progress + 1
-                document.getElementById('skill-bar-' + course_skill).style = "width:" + skills[course_skill].progress + "%";
-                document.getElementById('skill-number-' + course_skill).innerHTML = skills[course_skill].progress + "%";
-            }
-            else {
-                gameLog(course_skill + " is 100, not increasing", LoggingLevel.INFO);
-            }
-        }
-      }
+    /* handle language change */
+    gameLog("Doing language change", LoggingLevel.INFO);
+    var innerHTML = "";
+    for (language in languages) {
+        lang_details = languages[language];
+        gameLog("Updating " + lang_details.title, LoggingLevel.INFO);
+        innerHTML = innerHTML + '<p>' + lang_details.title + '</p>';
+        innerHTML = innerHTML + '<div class="w3-light-grey w3-round-xlarge">';
+        innerHTML = innerHTML + '<div class="w3-round-xlarge w3-teal" style="height:24px;width:' + lang_details.progress + '%">';
+        innerHTML = innerHTML + '<div class="w3-center w3-text-white">' + lang_details.progress + '%</div>';
+        innerHTML = innerHTML + '</div></div>';
+    }
+    document.getElementById('language-box').innerHTML = innerHTML;
 
     setTimeout(gameLoop, 1000);
 };
@@ -194,5 +188,5 @@ var current_job = jobs.line_cook;
 var logLevel = LoggingLevel.WARN;
 
 gameLog("Welcome to IDLE HACKER V0.1 - jack@latrobe.group");
-
 gameLoop();
+//TODO - gameLoopPhase2() - What happens when you reach the limits of a single human hacker?

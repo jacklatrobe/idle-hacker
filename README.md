@@ -25,3 +25,6 @@ https://latrobe.group/
  - Add a shop where you can spend money on things
  - Add a perk system so shop items can apply benefits
  - Make the skills, jobs, languages etc sections dynamically render
+ - Expand on the lore...
+ - Implement the descriptions as hover tooltips
+ - (DONE) Implement a basic logging framework to aid debugging
