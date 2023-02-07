@@ -7,3 +7,4 @@ A single version of the game is made available through github.io - all versions 
 ## Reporting a Vulnerability
 
 Report all security problems by raising an issue in GitHub for attention.
+https://github.com/jacklatrobe/idle-hacker/issues
