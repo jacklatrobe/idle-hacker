@@ -127,7 +127,7 @@ var gameLoop = function () {
 
 
     /* handle cash change */
-    var cash = cash + (current_job.salary * 8);
+    var cash = (cash + (current_job.salary * 8));
     gameLog("Incrementing cash to $" + cash, LoggingLevel.INFO);
     document.getElementById('cash_line').innerHTML = (
         '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
