@@ -29,3 +29,4 @@ https://latrobe.group/
  - Expand on the lore...
  - Implement the descriptions as hover tooltips
  - (DONE) Implement a basic logging framework to aid debugging
+ - (DONE) Refactor key game data structures into classes
