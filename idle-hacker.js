@@ -119,7 +119,7 @@ var languages = {
 var gameLoop = function () {
     /* handle date change */
     game_date.setDate(game_date.getDate() + 1);
-    pretty_game_date = (game_date.getDate() + '/' + game_date.getMonth() + '/' + game_date.getFullYear());
+    var pretty_game_date = (game_date.getDate() + '/' + game_date.getMonth() + '/' + game_date.getFullYear());
     gameLog("Incrementing date to " + pretty_game_date, LoggingLevel.INFO);
     document.getElementById('date_line').innerHTML = (
         '<i class="fa fa-calendar fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
@@ -127,7 +127,7 @@ var gameLoop = function () {
 
 
     /* handle cash change */
-    cash = cash + (current_job.salary * 8);
+    var cash = (cash + (current_job.salary * 8));
     gameLog("Incrementing cash to $" + cash, LoggingLevel.INFO);
     document.getElementById('cash_line').innerHTML = (
         '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
@@ -137,14 +137,14 @@ var gameLoop = function () {
     /* handle education change */
     gameLog("Doing education change", LoggingLevel.INFO);
     for (var course in education) {
-        course_details = education[course];
+        var course_details = education[course];
         gameLog(course_details.title + " increases " + course_details.skills, LoggingLevel.INFO);
         for (var i = 0; i < course_details.skills.length; i++) {
-            course_skill = course_details.skills[i];
+            var course_skill = course_details.skills[i];
             gameLog("Checking " + course_skill, LoggingLevel.INFO);
             if (skills[course_skill].progress < 100) {
                 gameLog(course_skill + " is less than 100, increasing", LoggingLevel.INFO);
-                skills[course_skill].progress = skills[course_skill].progress + 1
+                skills[course_skill].progress = skills[course_skill].progress + 1;
                 document.getElementById('skill-bar-' + course_skill).style = "width:" + skills[course_skill].progress + "%";
                 document.getElementById('skill-number-' + course_skill).innerHTML = skills[course_skill].progress + "%";
             }
@@ -158,7 +158,7 @@ var gameLoop = function () {
     gameLog("Doing language change", LoggingLevel.INFO);
     var innerHTML = "";
     for (language in languages) {
-        lang_details = languages[language];
+        var lang_details = languages[language];
         gameLog("Updating " + lang_details.title, LoggingLevel.INFO);
         innerHTML = innerHTML + '<p>' + lang_details.title + '</p>';
         innerHTML = innerHTML + '<div class="w3-light-grey w3-round-xlarge">';
