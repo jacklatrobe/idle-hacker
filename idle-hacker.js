@@ -174,6 +174,7 @@ class Job {
       "</span></h6>";
     innerHTML = innerHTML + "<p>" + this.description + "</p>";
     innerHTML = innerHTML + "<hr></div>";
+    return innerHTML;
   }
 }
 
