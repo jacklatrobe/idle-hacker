@@ -45,7 +45,7 @@ class IdleGame {
 
     /* handle education change */
     this.gameLog("Doing education / skills change", LoggingLevel.INFO);
-    for (course in courses_list) {
+    for (let course in courses_list) {
         let courseObj = courses_list[course];
         this.gameLog(courseObj + " increases " + courseObj.skills, LoggingLevel.INFO);
         courseObj.do_skill_increase();
