@@ -45,15 +45,16 @@ class IdleGame {
 
     /* handle education change */
     this.gameLog("Doing education / skills change", LoggingLevel.INFO);
-    for (var course in courses_list) {
-        this.gameLog(course + " increases " + course.skills, LoggingLevel.INFO);
-      course.do_skill_increase();
-    }
+    for (course in courses_list) {
+        let courseObj = courses_list[course];
+        this.gameLog(courseObj + " increases " + courseObj.skills, LoggingLevel.INFO);
+        courseObj.do_skill_increase();
+    };
 
 
     this.render_page();
     setTimeout(this.gameLoop, 1000);
-  }
+  };
 
   render_page() {
     this.gameLog("Rendering game HTML content", LoggingLevel.INFO);
@@ -117,14 +118,14 @@ class IdleGame {
       let logline = severity.name + " - " + currDate + " - " + text;
       console.log(logline);
     }
-  }
+  };
 
   changeJob(newJob) {
     this.gameLog("Changing job to " + newJob.toString(), LoggingLevel.INFO);
     this.previous_jobs.push(this.current_job);
     this.current_job = newJob;
-  }
-}
+  };
+};
 
 /* define a class for jobs */
 class Job {
@@ -140,13 +141,13 @@ class Job {
     this.salary = salary;
     this.start_date = start_date;
     this.end_date = end_date;
-  }
+  };
   toString() {
     return this.title + " - " + this.company;
-  }
+  };
   get_salary(hours = 8) {
     return this.salary * hours;
-  }
+  };
   render_dates() {
     let start_month = this.start_date.toLocaleString("default", {
       month: "long",
@@ -159,7 +160,7 @@ class Job {
     });
     let end_year = this.start_date.toLocaleString("default", { year: "full" });
     return start_month + " " + start_year + " - " + end_month + " " + end_year;
-  }
+  };
   render_html() {
     let innerHTML = '<div class="w3-container">';
     innerHTML =
@@ -175,28 +176,28 @@ class Job {
     innerHTML = innerHTML + "<p>" + this.description + "</p>";
     innerHTML = innerHTML + "<hr></div>";
     return innerHTML;
-  }
-}
+  };
+};
 
 /* define parent class for skills and education */
 class Advancable {
   constructor() {
     this.xp = 0;
     this.level = 0;
-  }
+  };
   xp_to_advance = function () {
     return 1000 + this.level * 1.3 * 500;
   };
   add_xp(amount = 1) {
     this.xp = this.xp + amount;
     this.advance_progress();
-  }
+  };
   #advance_progress() {
     while (this.xp > this.xp_to_advance) {
       this.xp = this.xp - this.xp_to_advance;
       this.level = this.level + 1;
     }
-  }
+  };
   render_html() {
     let innerHTML = "<p>" + this.toString() + "</p>";
     let percent_left = Math.round((this.xp / this.xp_to_advance) * 100);
@@ -211,11 +212,11 @@ class Advancable {
       innerHTML + '<div class="w3-center w3-text-white">' + this.level + "%";
     innerHTML = innerHTML + "</div></div></div>";
     return innerHTML;
-  }
+  };
   toString() {
     return this.title;
-  }
-}
+  };
+};
 
 /* define a class for education */
 class Education extends Advancable {
@@ -232,7 +233,7 @@ class Education extends Advancable {
     this.skills = skills;
     this.start_date = start_date;
     this.end_date = end_date;
-  }
+  };
   toString() {
     return (
       this.title +
@@ -242,7 +243,7 @@ class Education extends Advancable {
       this.end_date.getFullYear() +
       ")"
     );
-  }
+  };
   render_dates() {
     let start_month = this.start_date.toLocaleString("default", {
       month: "long",
@@ -255,7 +256,7 @@ class Education extends Advancable {
     });
     let end_year = this.start_date.toLocaleString("default", { year: "full" });
     return start_month + " " + start_year + " - " + end_month + " " + end_year;
-  }
+  };
   render_html() {
     let innerHTML = '<div class="w3-container">';
     innerHTML =
@@ -271,15 +272,15 @@ class Education extends Advancable {
     innerHTML = innerHTML + "<p>" + this.description + "</p>";
     innerHTML = innerHTML + "<hr></div>";
     return innerHTML;
-  }
+  };
   do_skill_increase() {
     for (var skill in this.skills) {
       skill.add_xp(100);
     }
-  }
+  };
   graduate() {
     this.end_date = Date.now();
-  }
+  };
 }
 
 /* define a class for skills */
