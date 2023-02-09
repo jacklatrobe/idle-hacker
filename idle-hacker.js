@@ -3,9 +3,6 @@
 
 /* data structure for the logging framework */
 const LoggingLevel = {
-  INFO: 0,
-  WARN: 1,
-  ERROR: 2,
   get INFO() {
     return {
       name: "INFO",
@@ -36,37 +33,76 @@ class IdleGame {
 
   gameLoop() {
     /* handle date change */
-    current_game_date.setDate(current_game_date.getDate() + 1);
+    this.gameLog("Rendering game date", LoggingLevel.INFO);
+    this.current_game_date.setDate(this.current_game_date.getDate() + 1);
+
+    /* handle cash change */
+    this.current_cash = this.current_cash + this.current_job.get_salary();
+    this.gameLog("Incrementing cash to $" + this.current_cash, LoggingLevel.INFO);
+    document.getElementById("cash_line").innerHTML =
+      '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
+      this.current_cash;
+
+    /* handle education change */
+    this.gameLog("Doing education / skills change", LoggingLevel.INFO);
+    for (var course in courses_list) {
+        this.gameLog(course + " increases " + course.skills, LoggingLevel.INFO);
+      course.do_skill_increase();
+    }
+
+
+    this.render_page();
+    setTimeout(this.gameLoop, 1000);
+  }
+
+  render_page() {
+    this.gameLog("Rendering game HTML content", LoggingLevel.INFO);
+
+    /* render game date change */
+    this.gameLog("Rendering new game date", LoggingLevel.INFO);
     var pretty_game_date =
-      current_game_date.getDate() +
+    this.current_game_date.getDate() +
       "/" +
-      current_game_date.getMonth() +
+      this.current_game_date.getMonth() +
       "/" +
-      current_game_date.getFullYear();
-    gameLog("Incrementing date to " + pretty_game_date, LoggingLevel.INFO);
+      this.current_game_date.getFullYear();
     document.getElementById("date_line").innerHTML =
       '<i class="fa fa-calendar fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
       pretty_game_date;
 
-    /* handle cash change */
-    current_cash = current_cash + current_job.get_salary();
-    gameLog("Incrementing cash to $" + current_cash, LoggingLevel.INFO);
+    /* render game cash change */
+    this.gameLog("Rendering new cash value", LoggingLevel.INFO);
     document.getElementById("cash_line").innerHTML =
       '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
-      current_cash;
+      this.current_cash;
 
-    /* handle education change */
-    gameLog("Doing education change", LoggingLevel.INFO);
+    /* render jobs */
+    this.gameLog("Rendering list of jobs", LoggingLevel.INFO);
+    let tempHTML = this.current_job.render_html();
+    for (var old_job in this.previous_jobs) {
+        tempHTML = tempHTML + old_job.render_html();
+    };
+    document.getElementById("jobs-box").innerHTML = tempHTML;
+
+    /* render education */
+    this.gameLog("Rendering list of courses", LoggingLevel.INFO);
+    tempHTML = "";
     for (var course in courses_list) {
-      gameLog(course + " increases " + course.skills, LoggingLevel.INFO);
-      course.do_skill_increase();
-    }
+        tempHTML = tempHTML + course.render_html();
+    };
+    document.getElementById("education-box").innerHTML = tempHTML;
 
-    setTimeout(gameLoop, 1000);
+    /* render skills */
+    this.gameLog("Rendering list of skills", LoggingLevel.INFO);
+    tempHTML = "";
+    for (var skill in skills_list) {
+        tempHTML = tempHTML + skill.render_html();
+    };
+    document.getElementById("skills-box").innerHTML = tempHTML;
   };
 
   gameLog(text, severity = LoggingLevel.WARN) {
-    if (severity.value >= logLevel.value) {
+    if (severity.value >= this.logLevel.value) {
       let currDate = new Date(Date.now());
       currDate =
         currDate.getDate() +
@@ -81,20 +117,29 @@ class IdleGame {
       let logline = severity.name + " - " + currDate + " - " + text;
       console.log(logline);
     }
-  };
+  }
 
   changeJob(newJob) {
-    previous_jobs.push(current_job);
-    current_job = newJob;
-  };
-};
+    this.gameLog("Changing job to " + newJob.toString(), LoggingLevel.INFO);
+    this.previous_jobs.push(this.current_job);
+    this.current_job = newJob;
+  }
+}
 
 /* define a class for jobs */
 class Job {
-  constructor(title, company, salary) {
+  constructor(
+    title,
+    company,
+    salary,
+    start_date = Date.now(),
+    end_date = null
+  ) {
     this.title = title;
     this.company = company;
     this.salary = salary;
+    this.start_date = start_date;
+    this.end_date = end_date;
   }
   toString() {
     return this.title + " - " + this.company;
@@ -102,24 +147,70 @@ class Job {
   get_salary(hours = 8) {
     return this.salary * hours;
   }
-};
+  render_dates() {
+    let start_month = this.start_date.toLocaleString("default", {
+      month: "long",
+    });
+    let start_year = this.start_date.toLocaleString("default", {
+      year: "full",
+    });
+    let end_month = this.start_date.toLocaleString("default", {
+      month: "long",
+    });
+    let end_year = this.start_date.toLocaleString("default", { year: "full" });
+    return start_month + " " + start_year + " - " + end_month + " " + end_year;
+  }
+  render_html() {
+    let innerHTML = '<div class="w3-container">';
+    innerHTML =
+      innerHTML + '<h5 class="w3-opacity"><b>' + this.toString() + "</b></h5>";
+    innerHTML =
+      innerHTML +
+      '<h6 class="w3-text-teal"><i class="fa fa-calendar fa-fw w3-margin-right"></i>';
+    innerHTML =
+      innerHTML +
+      '<span class="w3-tag w3-teal w3-round">' +
+      this.render_dates() +
+      "</span></h6>";
+    innerHTML = innerHTML + "<p>" + this.description + "</p>";
+    innerHTML = innerHTML + "<hr></div>";
+  }
+}
 
 /* define parent class for skills and education */
 class Advancable {
   xp = 0;
   level = 0;
   xp_to_advance = function () {
-    return 1000 + level * 1.3 * 500;
+    return 1000 + this.level * 1.3 * 500;
   };
   add_xp(amount = 1) {
     this.xp = this.xp + amount;
-    this.#advance_progress();
+    this.advance_progress();
   }
   #advance_progress() {
     while (this.xp > this.xp_to_advance) {
       this.xp = this.xp - this.xp_to_advance;
       this.level = this.level + 1;
     }
+  }
+  render_html() {
+    let innerHTML = "<p>" + this.toString() + "</p>";
+    let percent_left = Math.round((this.xp / this.xp_to_advance) * 100);
+    innerHTML =
+      innerHTML + '<div class="w3-light-grey w3-round-xlarge w3-small">';
+    innerHTML =
+      innerHTML +
+      '<div class="w3-container w3-center w3-round-xlarge w3-teal" style="width:' +
+      percent_left +
+      '%">';
+    innerHTML =
+      innerHTML + '<div class="w3-center w3-text-white">' + this.level + "%";
+    innerHTML = innerHTML + "</div></div></div>";
+    return innerHTML;
+  }
+  toString() {
+    return this.title;
   }
 }
 
@@ -148,8 +239,34 @@ class Education extends Advancable {
       ")"
     );
   }
-  htmlClassName() {
-    return "todo";
+  render_dates() {
+    let start_month = this.start_date.toLocaleString("default", {
+      month: "long",
+    });
+    let start_year = this.start_date.toLocaleString("default", {
+      year: "full",
+    });
+    let end_month = this.start_date.toLocaleString("default", {
+      month: "long",
+    });
+    let end_year = this.start_date.toLocaleString("default", { year: "full" });
+    return start_month + " " + start_year + " - " + end_month + " " + end_year;
+  }
+  render_html() {
+    let innerHTML = '<div class="w3-container">';
+    innerHTML =
+      innerHTML + '<h5 class="w3-opacity"><b>' + this.toString() + "</b></h5>";
+    innerHTML =
+      innerHTML +
+      '<h6 class="w3-text-teal"><i class="fa fa-calendar fa-fw w3-margin-right"></i>';
+    innerHTML =
+      innerHTML +
+      '<span class="w3-tag w3-teal w3-round">' +
+      this.render_dates() +
+      "</span></h6>";
+    innerHTML = innerHTML + "<p>" + this.description + "</p>";
+    innerHTML = innerHTML + "<hr></div>";
+    return innerHTML;
   }
   do_skill_increase() {
     for (var skill in this.skills) {
@@ -167,9 +284,6 @@ class Skill extends Advancable {
     this.title = title;
     this.description = description;
   }
-  toString() {
-    return this.title;
-  }
 }
 
 /* define a class for languages */
@@ -177,9 +291,6 @@ class Language extends Advancable {
   constructor(title, description) {
     this.title = title;
     this.description = description;
-  }
-  toString() {
-    return this.title;
   }
 }
 
@@ -217,9 +328,7 @@ var languages_list = [
     "VB.NET",
     "Visual Basic dotNet - increases your basic productivity"
   ),
-  new Skill(
-    "JavaScript", 
-    "A flexible and widely used web language"),
+  new Skill("JavaScript", "A flexible and widely used web language"),
   new Skill(
     "Python",
     "A flexible language for buidling web servers to basic AI models"
