@@ -179,8 +179,10 @@ class Job {
 
 /* define parent class for skills and education */
 class Advancable {
-  xp = 0;
-  level = 0;
+  constructor() {
+    this.xp = 0;
+    this.level = 0;
+  }
   xp_to_advance = function () {
     return 1000 + this.level * 1.3 * 500;
   };
@@ -223,6 +225,7 @@ class Education extends Advancable {
     start_date = Date.now(),
     end_date = null
   ) {
+    super();
     this.title = title;
     this.description = description;
     this.skills = skills;
@@ -281,6 +284,7 @@ class Education extends Advancable {
 /* define a class for skills */
 class Skill extends Advancable {
   constructor(title, description) {
+    super();
     this.title = title;
     this.description = description;
   }
@@ -289,6 +293,7 @@ class Skill extends Advancable {
 /* define a class for languages */
 class Language extends Advancable {
   constructor(title, description) {
+    super();
     this.title = title;
     this.description = description;
   }
