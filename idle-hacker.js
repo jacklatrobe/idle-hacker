@@ -34,7 +34,7 @@ class IdleGame {
   gameLoop() {
     /* handle date change */
     this.gameLog("Rendering game date", LoggingLevel.INFO);
-    this.current_game_date.setDate(this.current_game_date + 1);
+    this.current_game_date = (this.current_game_date + 1);
 
     /* handle cash change */
     this.current_cash = this.current_cash + this.current_job.get_salary();
