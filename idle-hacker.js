@@ -25,85 +25,85 @@ const LoggingLevel = {
 
 /* main game class */
 class IdleGame {
-  current_game_date = Date.now();
-  current_cash = 0;
-  current_job = new Job("Line Cook", "McDonalds", "15");
-  previous_jobs = [];
-  logLevel = LoggingLevel.INFO;
+  constructor() {
+    this.current_game_date = Date.now();
+    this.current_cash = 0;
+    this.current_job = new Job("Line Cook", "McDonalds", "15");
+    this.previous_jobs = [];
+
+    IdleGame.gameLog("Welcome to IDLE HACKER V0.1 - jack@latrobe.group");
+    this.gameLoop();
+  }
 
   gameLoop() {
     /* handle date change */
-    this.gameLog("Rendering game date", LoggingLevel.INFO);
+    IdleGame.gameLog("Updating game date", LoggingLevel.INFO);
     this.current_game_date = (this.current_game_date + 1);
 
     /* handle cash change */
-    this.current_cash = this.current_cash + this.current_job.get_salary();
-    this.gameLog("Incrementing cash to $" + this.current_cash, LoggingLevel.INFO);
+    this.current_cash = this.current_cash + (this.current_job.get_salary());
+    IdleGame.gameLog("Incrementing cash to $" + this.current_cash, LoggingLevel.INFO);
     document.getElementById("cash_line").innerHTML =
-      '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
-      this.current_cash;
+      `<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>${this.current_cash}`;
 
     /* handle education change */
-    this.gameLog("Doing education / skills change", LoggingLevel.INFO);
+    IdleGame.gameLog("Doing education / skills change", LoggingLevel.INFO);
     for (let course in courses_list) {
         let courseObj = courses_list[course];
-        this.gameLog(courseObj + " increases " + courseObj.skills, LoggingLevel.INFO);
+        IdleGame.gameLog(`${courseObj} increases ${courseObj.skills}`, LoggingLevel.INFO);
         courseObj.do_skill_increase();
     };
-
-
     this.render_page();
-    setTimeout(this.gameLoop, 1000);
+    setTimeout(this.gameLoop(), 1000);
   };
 
   render_page() {
-    this.gameLog("Rendering game HTML content", LoggingLevel.INFO);
+    IdleGame.gameLog("Rendering game HTML content", LoggingLevel.INFO);
 
     /* render game date change */
-    this.gameLog("Rendering new game date", LoggingLevel.INFO);
-    var pretty_game_date =
-    this.current_game_date.getDate() +
-      "/" +
-      this.current_game_date.getMonth() +
-      "/" +
-      this.current_game_date.getFullYear();
+    IdleGame.gameLog("Rendering new game date", LoggingLevel.INFO);
+    var pretty_game_date = new Date(this.current_game_date).toLocaleString("en-AU");
     document.getElementById("date_line").innerHTML =
       '<i class="fa fa-calendar fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
       pretty_game_date;
 
     /* render game cash change */
-    this.gameLog("Rendering new cash value", LoggingLevel.INFO);
+    IdleGame.gameLog("Rendering new cash value", LoggingLevel.INFO);
     document.getElementById("cash_line").innerHTML =
       '<i class="fa fa-usd fa-fw w3-margin-right w3-large w3-text-teal"></i>' +
       this.current_cash;
 
     /* render jobs */
-    this.gameLog("Rendering list of jobs", LoggingLevel.INFO);
+    IdleGame.gameLog("Rendering list of jobs", LoggingLevel.INFO);
     let tempHTML = this.current_job.render_html();
-    for (var old_job in this.previous_jobs) {
-        tempHTML = tempHTML + old_job.render_html();
+    for (let old_job in this.previous_jobs) {
+        let jobObj = this.previous_jobs[old_job];
+        tempHTML = tempHTML + jobObj.render_html();
     };
     document.getElementById("jobs-box").innerHTML = tempHTML;
 
     /* render education */
-    this.gameLog("Rendering list of courses", LoggingLevel.INFO);
+    IdleGame.gameLog("Rendering list of courses", LoggingLevel.INFO);
     tempHTML = "";
-    for (var course in courses_list) {
-        tempHTML = tempHTML + course.render_html();
+    for (let course in courses_list) {
+        let courseObj = courses_list[course];
+        tempHTML = tempHTML + courseObj.render_html();
     };
     document.getElementById("education-box").innerHTML = tempHTML;
 
     /* render skills */
-    this.gameLog("Rendering list of skills", LoggingLevel.INFO);
+    IdleGame.gameLog("Rendering list of skills", LoggingLevel.INFO);
     tempHTML = "";
-    for (var skill in skills_list) {
-        tempHTML = tempHTML + skill.render_html();
+    for (let skill in skills_list) {
+        let skillObj = skills_list[skill];
+        tempHTML = tempHTML + skillObj.render_html();
     };
     document.getElementById("skills-box").innerHTML = tempHTML;
   };
 
-  gameLog(text, severity = LoggingLevel.WARN) {
-    if (severity.value >= this.logLevel.value) {
+  static gameLog(text, severity = LoggingLevel.WARN) {
+    var logLevel = LoggingLevel.INFO;
+    if (severity.value >= logLevel.value) {
       let currDate = new Date(Date.now());
       currDate =
         currDate.getDate() +
@@ -121,7 +121,7 @@ class IdleGame {
   };
 
   changeJob(newJob) {
-    this.gameLog("Changing job to " + newJob.toString(), LoggingLevel.INFO);
+    IdleGame.gameLog("Changing job to " + newJob.toString(), LoggingLevel.INFO);
     this.previous_jobs.push(this.current_job);
     this.current_job = newJob;
   };
@@ -192,7 +192,7 @@ class Advancable {
     this.xp = this.xp + amount;
     this.advance_progress();
   };
-  #advance_progress() {
+  advance_progress() {
     while (this.xp > this.xp_to_advance) {
       this.xp = this.xp - this.xp_to_advance;
       this.level = this.level + 1;
@@ -235,14 +235,13 @@ class Education extends Advancable {
     this.end_date = end_date;
   };
   toString() {
-    return (
-      this.title +
-      "(" +
-      this.start_date.getFullYear() +
-      "-" +
-      this.end_date.getFullYear() +
-      ")"
-    );
+    let start_date_obj = new Date(this.start_date);
+    let date_string = start_date_obj.toLocaleString("default", {year: "numeric"});
+    if ((this.end_date !== undefined) && (this.end_date !== null)) {
+      let end_date_obj = new Date(this.end_date);
+      date_string = date_string + " - " + end_date_obj.toLocaleString("default", {year: "numeric"});
+    }
+    return (`${this.title} (${date_string})`);
   };
   render_dates() {
     let start_month = this.start_date.toLocaleString("default", {
@@ -274,8 +273,9 @@ class Education extends Advancable {
     return innerHTML;
   };
   do_skill_increase() {
-    for (var skill in this.skills) {
-      skill.add_xp(100);
+    for (let skill in this.skills) {
+      let skillObj = this.skills[skill];
+      skillObj.add_xp(100);
     }
   };
   graduate() {
@@ -380,8 +380,5 @@ var courses_list = {
 
 /* main game flow */
 var gameObj = new IdleGame();
-
-gameObj.gameLog("Welcome to IDLE HACKER V0.1 - jack@latrobe.group");
-gameObj.gameLoop();
 
 //TODO - gameLoopPhase2() - What happens when you reach the limits of a single human hacker?
